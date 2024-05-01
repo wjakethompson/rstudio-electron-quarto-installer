@@ -36,7 +36,12 @@ echo "Beginning RStudio installation"
 
 # Get metadata for the latest Electron for macOS
 echo "  - Retrieving macOS RStudio (electron) daily metadata"
-curl --silent https://dailies.rstudio.com/rstudio/cranberry-hibiscus/index.json -o /tmp/index.json
+curl --silent -L https://dailies.rstudio.com/rstudio -o /tmp/branches.html
+BRCH=$(xidel -s --xpath "(//div[@class='card-body']//h5)[1]" /tmp/branches.html)
+BURL=$(echo $BRCH | tr '[:upper:]' '[:lower:]' | tr " " "-")
+
+echo "  - Using branch: ${BRCH}"
+curl --silent "https://dailies.rstudio.com/rstudio/${BURL}/index.json" -o /tmp/index.json
 
 # Get the DMG URL and name
 DMG=$(cat /tmp/index.json | $JQ_BIN -r .electron.platforms.macos.link)
